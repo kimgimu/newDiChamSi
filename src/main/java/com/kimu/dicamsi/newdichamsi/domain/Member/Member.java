@@ -36,4 +36,9 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false)
     private Role role;
 
+    @PrePersist
+    public void onPrePersist(){
+        this.role = Role.USER;
+    }
+
 }
