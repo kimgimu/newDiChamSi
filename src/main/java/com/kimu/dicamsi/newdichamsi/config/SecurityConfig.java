@@ -28,7 +28,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST,"/api/login").permitAll()//로그인 요청은 누구나 허용
-                .antMatchers(HttpMethod.POST,"/api/join").permitAll()//가입 요청은 누구나 허용
+                .antMatchers(HttpMethod.POST,"/api/join/**").permitAll()//가입 요청은 누구나 허용
                 .antMatchers(HttpMethod.GET,"/api/public/**").permitAll()//로그인 하지 않은 유저 콘텐츠 허용 주소
                 .anyRequest().hasRole("USER");//나머지는 다 회원만 가능
     }
