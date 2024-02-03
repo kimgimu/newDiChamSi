@@ -10,3 +10,13 @@ spring:
     show-sql: true
     properties:
       hibernate.format_sql: true
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+      force-request: true
+      force-response: true
+  tomcat:
+    uri-encoding: UTF-8

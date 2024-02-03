@@ -45,6 +45,24 @@ public class MemberService {
         return memberRepository.existsByEmail(email);
     }
 
+    public Boolean checkDuplicates(String type,String request) {
+        if(request == null) {
+           throw new RuntimeException(type + "을(를) 입력하세오");
+       }
+       switch (type) {
+           case "username" :
+               return memberRepository.existsByUsername(request);
+           case "nickname" :
+               return memberRepository.existsByNickname(request);
+           case "email" :
+               return memberRepository.existsByEmail(request);
+           default:
+               throw new RuntimeException("해당 타입이 없습니다");
+       }
+
+
+    }
+
 
 
 }
