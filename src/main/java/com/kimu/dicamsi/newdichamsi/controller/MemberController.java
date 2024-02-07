@@ -2,13 +2,14 @@ package com.kimu.dicamsi.newdichamsi.controller;
 
 import com.kimu.dicamsi.newdichamsi.dto.MemberDTO;
 import com.kimu.dicamsi.newdichamsi.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.Objects;
 
 @RestController
@@ -17,6 +18,11 @@ import java.util.Objects;
 public class MemberController {
 
     private final MemberService memberService;
+
+    @PostMapping("/api/auth/test")
+    public ResponseEntity<?> test(String msg) {
+        return ResponseEntity.ok(msg);
+    }
 
     @PostMapping("/api/join/test")
     public ResponseEntity<?> test(@RequestBody MemberDTO.request request) {
@@ -51,6 +57,8 @@ public class MemberController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+
 
 //    //아이디 중복검사
 //    @PostMapping("/api/join/check/username")
@@ -99,7 +107,7 @@ public class MemberController {
 //    }
 
     //회원가입
-    @PostMapping("/api/join")
+    @PostMapping("/api/auth/join")
     public ResponseEntity<?> join(@Valid @RequestBody MemberDTO.request request, BindingResult bindingResult){
         if (bindingResult.hasErrors()){
             log.info("실패 원인 : {}", Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());

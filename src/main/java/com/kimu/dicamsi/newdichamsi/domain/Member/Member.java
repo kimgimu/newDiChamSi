@@ -1,12 +1,13 @@
 package com.kimu.dicamsi.newdichamsi.domain.Member;
 
 import com.kimu.dicamsi.newdichamsi.domain.BaseTimeEntity;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

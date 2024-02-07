@@ -20,3 +20,8 @@ server:
       force-response: true
   tomcat:
     uri-encoding: UTF-8
+dcs:
+  app:
+    jwtSecret: mokomokodsapiufhkajsdnfkwenmrklfnasdkckslks
+    jwtExpirationMs: 86400000
+

@@ -1,35 +1,76 @@
 package com.kimu.dicamsi.newdichamsi.config;
 
+import com.kimu.dicamsi.newdichamsi.config.filter.LoginFilter;
+import com.kimu.dicamsi.newdichamsi.service.CustomMemberDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
+
+    private final AuthenticationConfiguration authenticationConfiguration;
+    private final CustomMemberDetailsService customMemberDetailsService;
+    private final JwtUtils jwtUtils;
+    private final CorsConfig corsConfig;
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
     @Bean
     public BCryptPasswordEncoder encoder(){
         return new BCryptPasswordEncoder();
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+//    @Bean
+//    public AuthenticationProvider authenticationProvider(){
+//        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+//        authenticationProvider.setUserDetailsService(customMemberDetailsService);
+//        authenticationProvider.setPasswordEncoder(encoder());
+//        return authenticationProvider;
+//    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .httpBasic().disable()//기본설정을 해제함
-                .csrf().disable()//RestAPI는 쿠키를 쓰지 않기 때문에 해제함
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)//RESTAPI는 세션에 의존하지 않기때문에 세션 생성 안함
-                .and()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.POST,"/api/login").permitAll()//로그인 요청은 누구나 허용
-                .antMatchers(HttpMethod.POST,"/api/join/**").permitAll()//가입 요청은 누구나 허용
-                .antMatchers(HttpMethod.GET,"/api/public/**").permitAll()//로그인 하지 않은 유저 콘텐츠 허용 주소
-                .anyRequest().hasRole("USER");//나머지는 다 회원만 가능
+                .csrf((auth) -> auth.disable());
+
+        //From 로그인 방식 disable
+        http
+                .formLogin((auth) -> auth.disable());
+
+        //http basic 인증 방식 disable
+        http
+                .httpBasic((auth) -> auth.disable());
+        http
+                .cors(cors -> corsConfig.corsFilter());
+        http
+                .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http
+                .authorizeHttpRequests(
+                        (auth) -> auth
+                                .requestMatchers("/api/auth/login","/api/auth/join").permitAll()
+                                .requestMatchers("/api/auth/**").permitAll()
+                                .anyRequest().authenticated()//이 URL 경로 빼고는 다 인증이 필요함
+                );
+        http
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtils),UsernamePasswordAuthenticationFilter.class);
+//        http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class); //UsernamePasswordAuthenticationFilter 전에 실행
+//        http.authenticationProvider(authenticationProvider());
+        return http.build();
     }
+
+
 }

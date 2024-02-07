@@ -1,13 +1,13 @@
 package com.kimu.dicamsi.newdichamsi.dto;
 
 import com.kimu.dicamsi.newdichamsi.domain.Member.Member;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 public class MemberDTO {
 
